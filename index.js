@@ -17,7 +17,6 @@ const bodyParser = require('body-parser');
 const { URL } = require('url');
 const bcrypt = require('bcrypt');
 const http = require('http');
-const session = require('express-session');
 
 const limit = process.env.LIMIT || 50;
 
@@ -31,58 +30,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use(session({
-    secret: "wakameumaiyooooooooo",
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 5 * 24 * 60 * 60 * 1000 }
-}));
-
-//ログイン
-// 読み込み時ちぇっく
-app.use((req, res, next) => {
-    if (req.cookies.massiropass !== 'ok' && !req.path.includes('login')) {
-        return res.redirect('/login');
-    } else {
-        next();
-    }
-});
-//ログイン済み？
-app.get('/login/if', async (req, res) => {
-    if (req.cookies.massiropass !== 'ok') {
-        res.render('login', { error: 'ログインしていません。もう一度ログインして下さい' })
-    } else {
-        return res.redirect('/');
-    }
-});
-// ログインページ
-app.get('/login', (req, res) => {
-    res.render('login', { error: null });
-});
-// パスワード確認
-app.post('/login', (req, res) => {
-    const password = req.body.password;
-    if (password === 'wakame' || password === 'wakame02' || password === 'wakaran') {
-        res.cookie('massiropass', 'ok', { maxAge: 5 * 24 * 60 * 60 * 1000, httpOnly: true });
-        return res.redirect('/');
-    } else {
-        if (password === 'ohana') {
-            return res.redirect('https://ohuaxiehui.webnode.jp');
-        } else {
-            res.render('login', { error: 'パスワードが間違っています。もう一度お試しください。' });
-        }
-    }
-});
-//パスワードを忘れた場合
-app.get('/login/forgot', (req, res) => {
-  res.render(`login/forgot.ejs`);
-});
-//ログアウト
-app.post('/logout', (req, res) => {
-    res.cookie('massiropass', 'false', { maxAge: 0, httpOnly: true });
-    return res.redirect('/login');
-});
-
 //レギュラー
 app.get('/w/:id', async (req, res) => {
     const videoId = req.params.id;
@@ -93,14 +40,11 @@ app.get('/w/:id', async (req, res) => {
         'https://wtserver3.glitch.me',
         'https://wtserver1.glitch.me',
         'https://wtserver2.glitch.me',
-	'https://watawata8.glitch.me',
-	'https://watawata7.glitch.me',
-	'https://watawata37.glitch.me'
         ],
         '1': 'https://wataamee.glitch.me',
         '2': 'https://watawatawata.glitch.me',
         '3': 'https://amenable-charm-lute.glitch.me',
-        '4': 'https://watawata37.glitch.me',
+        '4': 'https://wtserver2.glitch.me',
         '5': 'https://wtserver1.glitch.me',
         "6": "https://battle-deciduous-bear.glitch.me",
         "7": 'https://productive-noon-van.glitch.me',
@@ -140,11 +84,12 @@ app.get('/w/:id', async (req, res) => {
   }
 });
 
+
 //高画質再生！！
 app.get('/www/:id', async (req, res) => {
   const videoId = req.params.id;
     try {
-        const response = await axios.get(`https://wataamee.glitch.me/api/${videoId}?token=wakameoishi`);
+        const response = await axios.get(`https://watawatawata.glitch.me/api/${videoId}?token=wakameoishi`);
         const videoData = response.data;
 
         res.render('highquo', { videoData, videoId });
@@ -162,7 +107,7 @@ app.get('/ll/:id', async (req, res) => {
   const videoId = req.params.id;
 
     try {
-        const response = await axios.get(`https://wataamee.glitch.me/api/${videoId}?token=wakameoishi`);
+        const response = await axios.get(`https://watawatawata.glitch.me/api/${videoId}?token=wakameoishi`);
         const videoData = response.data;
 
         res.render('listen', { videoData, videoId });
@@ -258,9 +203,10 @@ app.get("/", async (req, res) => {
     res.render("wakametube.ejs", { topVideos });
   } catch (error) {
     console.error('エラーが発生しました:', error);
-    res.status(500).send('データを取得できませんでした');
+    res.render("wakametube.ejs", { topVideos: [] });
   }
 });
+
 
 app.get('/st', (req, res) => {
     res.sendStatus(200);
@@ -713,7 +659,7 @@ app.get('/okiniiri', (req, res) => {
 
 app.get('/wakamc/f', (req, res) => {
     let favorites = [];
-
+　　　const charge = axios.get(`https://watawatawata.glitch.me/`);
     const cookie = req.headers.cookie
         .split('; ')
         .find(row => row.startsWith('wakamemusicfavorites='));
@@ -732,7 +678,7 @@ app.get('/wakamc/f', (req, res) => {
 //お気に入り
 app.get('/wakameokini', (req, res) => {
     let favorites = [];
-
+　　　const charge = axios.get(`https://watawatawata.glitch.me/`);
     const cookie = req.headers.cookie
         .split('; ')
         .find(row => row.startsWith('wakametubefavorites='));
@@ -842,6 +788,93 @@ app.get("/block/cc3q",(req, res) => {
     let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
   res.render('../views/tst/2.ejs', { ip: ip });
 })
+
+
+//edu
+app.get('/edu', (req, res) =>{
+  res.render('edu/home');
+})
+
+app.get('/wk/:id', async(req, res) => {
+  const { id } = req.params;
+  try{
+    const response = await axios.get(`https://wccreat.glitch.me/data/${id}`);
+    const html = response.data.html;
+    res.send(html);
+  }catch(error){
+    res.stat(500).send("ページが存在していません。");
+  }
+});
+
+app.get('/wk/login/:id', async(req, res) => {
+  const { id } = req.params;
+  try{
+    const response = await axios.get(`https://wccreat.glitch.me/data/${id}`);
+    const html = response.data.html;
+    res.send(html);
+  }catch(error){
+    res.stat(500).send("ページが存在していません。");
+  }
+});
+
+app.get('/edu/create/:id', (req, res) => {
+  const { id } = req.params;
+  res.render('edu/create', { id });
+});
+
+app.get('/edu/edit/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await axios.get(`https://wccreat.glitch.me/data/${id}`);
+    const html = response.data.html;
+    res.render('edu/edit', { id, html });
+  } catch (error) {
+    console.error('Error fetching HTML:', error.message);
+    res.status(500).send('HTMLデータの取得中にエラーが発生しました。');
+  }
+});
+
+app.get('/edu/f/:id', (req, res) => {
+  const id = req.params.id;
+  res.render(`edu/f/${id}`);
+});
+
+app.get('/edu/help/:id', (req, res) => {
+  const id = req.params.id;
+  res.render(`edu/help/${id}`);
+});
+
+app.get('/edu/site/:id', (req, res) => {
+  const id = req.params.id;
+  res.render(`edu/site/${id}`);
+});
+
+app.get('/edu/sitehtml/:id', (req, res) => {
+  const id = req.params.id;
+  res.render(`edu/sitehtml/${id}`);
+});
+
+app.get('/edu/site', (req, res) => {
+  const id = req.params.id;
+  res.render(`edu/site`);
+});
+
+app.all("/edu/request",async(req,res)=>{
+  try{
+    const path=req.query.path;
+    const options={
+      method:req.method,
+      url:`https://wccreat.glitch.me${path}`,
+      headers:{...req.headers,host:undefined},
+      data:["POST","PUT","PATCH"].includes(req.method)? req.body: null
+    };
+    const {data:response}=await axios(options);
+    res.set("Content-Type", "text/plain").send(response);
+  }catch(e){
+    console.error(e);
+    res.send({message:"リクエストに失敗しました"});
+  }
+});
 
 // エラー
 app.use((req, res) => {
